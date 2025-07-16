@@ -11,12 +11,15 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f4f8;
             margin: 0;
+            background-image: url('assets/background.jpg'); /* 使用本地背景图像 */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
         .player-container {
             text-align: center;
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.9); /* 半透明背景 */
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
@@ -82,8 +85,6 @@
             <option value="">Select a song</option>
             <option value="songs/Shino,初音ミク - バケモノの唄.mp3">Shino,初音ミク - バケモノの唄</option>
             <option value="songs/ぺぽよ - でんでん心電図.mp3">ぺぽよ - でんでん心電図</option>
-            <option value="songs/song3.mp3">Song 3</option>
-        </select>
         <br>
         <input type="range" id="progressBar" min="0" max="100" value="0" oninput="seekTo()" style="width: 100%;">
         <audio id="musicPlayer" controls>
