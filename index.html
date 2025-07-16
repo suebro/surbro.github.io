@@ -1,35 +1,77 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple Music Player</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f4f4f9;
+            background-color: #f0f4f8;
             margin: 0;
         }
         .player-container {
             text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 20px;
         }
         audio {
-            width: 300px;
+            width: 100%;
             margin-top: 20px;
         }
-        select, button {
+        input[type="range"] {
+            width: 100%;
+            margin-top: 20px;
+            -webkit-appearance: none; /* Remove default styling */
+            appearance: none;
+            background: #eee;
+            height: 5px;
+            border-radius: 5px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        input[type="range"]:focus {
+            outline: none;
+        }
+        button {
             margin: 5px;
             padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
             font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -38,10 +80,12 @@
         <h1>My Simple Music Player</h1>
         <select id="songSelect" onchange="changeSong()">
             <option value="">Select a song</option>
-            <option value="songs/Shino,初音ミク - バケモノの唄.mp3">初音ミク - バケモノの唄</option>
+            <option value="songs/Shino,初音ミク - バケモノの唄.mp3">Shino,初音ミク - バケモノの唄</option>
             <option value="songs/ぺぽよ - でんでん心電図.mp3">ぺぽよ - でんでん心電図</option>
             <option value="songs/song3.mp3">Song 3</option>
         </select>
+        <br>
+        <input type="range" id="progressBar" min="0" max="100" value="0" oninput="seekTo()" style="width: 100%;">
         <audio id="musicPlayer" controls>
             <source src="" type="audio/mpeg">
             Your browser does not support the audio element.
@@ -53,6 +97,7 @@
 
     <script>
         const musicPlayer = document.getElementById('musicPlayer');
+        const progressBar = document.getElementById('progressBar');
         const songSelect = document.getElementById('songSelect');
 
         function changeSong() {
@@ -60,6 +105,7 @@
             if (selectedSong) {
                 musicPlayer.src = selectedSong;
                 musicPlayer.load();
+                updateProgressBar();
             } else {
                 musicPlayer.src = '';
             }
@@ -72,6 +118,40 @@
         function pauseMusic() {
             musicPlayer.pause();
         }
+
+        function updateProgressBar() {
+            progressBar.max = musicPlayer.duration;
+            progressBar.value = musicPlayer.currentTime;
+
+            if (!isNaN(musicPlayer.duration)) {
+                progressBar.style.width = '100%';
+            }
+
+            if (musicPlayer.paused || musicPlayer.ended) {
+                clearInterval(updateProgressInterval);
+                return;
+            }
+
+            let updateProgressInterval = setInterval(() => {
+                progressBar.value = musicPlayer.currentTime;
+                if (musicPlayer.ended) {
+                    clearInterval(updateProgressInterval);
+                }
+            }, 1000);
+        }
+
+        musicPlayer.addEventListener('timeupdate', () => {
+            updateProgressBar();
+        });
+
+        function seekTo() {
+            const seekTime = progressBar.value;
+            musicPlayer.currentTime = seekTime;
+        }
+
+        musicPlayer.addEventListener('loadedmetadata', () => {
+            updateProgressBar();
+        });
     </script>
 </body>
 </html>
