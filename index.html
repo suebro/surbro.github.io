@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>術力口歌曲試聴プレイヤー</title>
+    <title>术力口歌曲试听网站Demo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -318,16 +318,16 @@
 </head>
 <body>
     <div class="player-container">
-        <h1>🎵 術力口歌曲試聴プレイヤー</h1>
+        <h1>🎵 术力口歌曲试听网站Demo</h1>
         
-        <div class="song-info" id="songTitle">曲を選択してください</div>
+         <div class="song-info" id="songTitle">Ciallo～(∠・ω< )⌒☆</div>
         
         <select id="songSelect">
-            <option data-cover="assets/default_cover.jpg" value="" data-title="選歌リスト">選歌リスト</option>
+            <option data-cover="assets/default_cover.jpg" value="" data-title="选歌菜单">选歌菜单</option>
             <option data-cover="assets/shino_cover.png" value="songs/Shino,初音ミク - バケモノの唄.mp3" data-title="Shino,初音ミク - バケモノの唄">Shino,初音ミク - バケモノの唄</option>
             <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - でんでん心電図.mp3" data-title="ぺぽよ - でんでん心電図">ぺぽよ - でんでん心電図</option>
-            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - 失態生態実験体.mp3" data-title="ぺぽよ - 失態生態実験体">ぺぽよ - 失態生態実験体</option>
-            <option data-cover="assets/12.png" value="songs/bk & 重音テト - 臙脂 ft. 重音テト.mp3" data-title="bk & 重音テト - 臙脂 ft. 重音テト">bk & 重音テト - 臙脂 ft. 重音テト
+            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - 失态生态实验体.mp3" data-title="ぺぽよ - 失態生態実験体">ぺぽよ - 失態生態実験体</option>
+            <option data-cover="assets/12.png" value="songs/bk & 重音テト - 臙脂 ft. 重音テト.mp3" data-title="bk & 重音テト - 臙脂 ft. 重音テト">bk & 重音テト - 臙脂 ft. 重音テト</option>
         </select>
         
         <div class="cover-container">
@@ -471,7 +471,7 @@
                 currentTimeDisplay.textContent = formatTime(0);
                 totalTimeDisplay.textContent = formatTime(0);
                 hideLoadingSpinner();
-                updateSongTitle('曲を選択してください');
+                updateSongTitle('Ciallo～(∠・ω< )⌒☆');
             }
         }
         
@@ -507,8 +507,8 @@
                     waveform.classList.add('music-playing');
                 })
                 .catch((error) => {
-                    console.error('再生エラー:', error);
-                    alert('再生に失敗しました、曲を選択してください');
+                    console.error('Ciallo～(∠・ω< )⌒☆:', error);
+                    alert('Ciallo～(∠・ω< )⌒☆');
                 });
         }
         
@@ -637,7 +637,7 @@
         
         musicPlayer.addEventListener('error', () => {
             hideLoadingSpinner();
-            alert('曲の読み込みに失敗しました、再試行するか他の曲を選択してください');
+            alert('你曲没了');
         });
         
         // 初始化
