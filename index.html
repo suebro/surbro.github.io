@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>术力口歌曲试听网站Demo</title>
+    <title>术力口歌曲试听网站</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -71,6 +71,37 @@
             font-size: 1.2rem;
             height: 1.8rem;
             color: #e6e6ff;
+        }
+        
+        .artist-filter {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .artist-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .artist-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .artist-btn.active {
+            background: rgba(255, 126, 179, 0.6);
+            box-shadow: 0 0 10px rgba(255, 126, 179, 0.4);
         }
         
         select {
@@ -302,6 +333,11 @@
             .controls i {
                 font-size: 24px;
             }
+            
+            .artist-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
         }
         
         @media (max-width: 400px) {
@@ -320,21 +356,39 @@
     <div class="player-container">
         <h1>🎵 术力口歌曲试听网站Demo</h1>
         
-         <div class="song-info" id="songTitle">Ciallo～(∠・ω< )⌒☆</div>
+        <div class="song-info" id="songTitle">Ciallo～(∠・ω< )⌒☆</div>
+        
+        <!-- 歌手分类按钮 -->
+        <div class="artist-filter" id="artistFilter">
+            <button class="artist-btn active" data-artist="all">全部歌手</button>
+            <button class="artist-btn" data-artist="初音ミク">初音ミク</button>
+            <button class="artist-btn" data-artist="ぺぽよ">ぺぽよ</button>
+            <button class="artist-btn" data-artist="重音テト">重音テト</button>
+            <button class="artist-btn" data-artist="サツキ">サツキ</button>
+            <button class="artist-btn" data-artist="DECO27">DECO27</button>
+            <button class="artist-btn" data-artist="bk">bk</button>
+            <button class="artist-btn" data-artist="奕夕">奕夕</button>
+            <button class="artist-btn" data-artist="ピノキオピー">ピノキオピー</button>
+            <button class="artist-btn" data-artist="Shino">Shino</button>
+        </div>
         
         <select id="songSelect">
-            <option data-cover="assets/default_cover.jpg" value="" data-title="选歌菜单">选歌菜单</option>
-            <option data-cover="assets/shino_cover.png" value="songs/Shino,初音ミク - バケモノの唄.mp3" data-title="Shino,初音ミク - バケモノの唄">Shino,初音ミク - バケモノの唄</option>
-            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - でんでん心電図.mp3" data-title="ぺぽよ - でんでん心電図">ぺぽよ - でんでん心電図</option>
-            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - 失态生态实验体.mp3" data-title="ぺぽよ - 失態生態実験体">ぺぽよ - 失態生態実験体</option>
-            <option data-cover="assets/12.png" value="songs/bk & 重音テト - 臙脂 ft. 重音テト.mp3" data-title="bk & 重音テト - 臙脂 ft. 重音テト">bk & 重音テト - 臙脂 ft. 重音テト</option>
-            <option data-cover="assets/13.png" value="songs/Butcher Vanity.mp3" data-title=" Butcher Vanity "> Butcher Vanity </option>
-            <option data-cover="assets/14.jpg" value="songs/メズマライザー (feat. 初音ミク&重音テト).mp3" data-title="サツキ,初音ミク,重音テト - メズマライザー (feat. 初音ミク&重音テト)">サツキ,初音ミク,重音テト - メズマライザー (feat. 初音ミク&重音テト)</option>
-            <option data-cover="assets/15.jpg" value="songs/DECO27,初音ミク - モニタリング.mp3" data-title="DECO27,初音ミク - モニタリング">DECO27,初音ミク - モニタリング</option>
+            <option data-cover="assets/default_cover.jpg" value="" data-title="选歌菜单" data-artist="all">选歌菜单</option>
+            <option data-cover="assets/shino_cover.png" value="songs/Shino,初音ミク - バケモノの唄.mp3" data-title="Shino,初音ミク - バケモノの唄" data-artist="Shino,初音ミク">Shino,初音ミク - バケモノの唄</option>
+            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - でんでん心電図.mp3" data-title="ぺぽよ - でんでん心電図" data-artist="ぺぽよ">ぺぽよ - でんでん心電図</option>
+            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - 失态生态实验体.mp3" data-title="ぺぽよ - 失態生態実験体" data-artist="ぺぽよ">ぺぽよ - 失態生態実験体</option>
+            <option data-cover="assets/12.png" value="songs/bk & 重音テト - 臙脂 ft. 重音テト.mp3" data-title="bk & 重音テト - 臙脂 ft. 重音テト" data-artist="bk,重音テト">bk & 重音テト - 臙脂 ft. 重音テト</option>
+            <option data-cover="assets/13.png" value="songs/Butcher Vanity.mp3" data-title=" Butcher Vanity " data-artist="奕夕"> Butcher Vanity </option>
+            <option data-cover="assets/14.jpg" value="songs/メズマライザー (feat. 初音ミク&重音テト).mp3" data-title="サツキ,初音ミク,重音テト - メズマライザー (feat. 初音ミク&重音テト)" data-artist="サツキ,初音ミク,重音テト">サツキ,初音ミク,重音テト - メズマライザー (feat. 初音ミク&重音テト)</option>
+            <option data-cover="assets/15.jpg" value="songs/DECO27,初音ミク - モニタリング.mp3" data-title="DECO27,初音ミク - モニタリング" data-artist="DECO27,初音ミク">DECO27,初音ミク - モニタリング</option>
+            <option data-cover="assets/16.jpg" value="songs/キャンディークッキーチョコレート (feat. 初音ミク & 重音テト).mp3" data-title="キャンディークッキーチョコレート (feat. 初音ミク & 重音テト)" data-artist="初音ミク,重音テト">キャンディークッキーチョコレート (feat. 初音ミク & 重音テト)</option>
+            <option data-cover="assets/17.jpg" value="songs/ぺぽよ,初音ミク - めんへらーめん.mp3" data-title="ぺぽよ,初音ミク - めんへらーめん" data-artist="ぺぽよ,初音ミク">ぺぽよ,初音ミク - めんへらーめん</option>
+            <option data-cover="assets/18.jpg" value="songs/ピノキオピー,初音ミク,重音テト - T氏の話を信じるな (feat. 初音ミク & 重音テト).mp3" data-title="ピノキオピー,初音ミク,重音テト - T氏の話を信じるな (feat. 初音ミク & 重音テト)"data-artist="ピノキオピー,初音ミク,重音テト">ピノキオピー,初音ミク,重音テト - T氏の話を信じるな (feat. 初音ミク & 重音テト)</option>
         </select>
+
         
         <div class="cover-container">
-            <img id="albumCover" src="assets/default_cover.jpg" alt="アルバムカバー">
+            <img id="albumCover" src="assets/default_cover.jpg" alt="专辑封面">
             <div class="loading-spinner" id="loadingSpinner"></div>
         </div>
         
@@ -366,7 +420,7 @@
         
         <audio id="musicPlayer">
             <source src="" type="audio/mpeg">
-            お使いのブラウザはオーディオ要素をサポートしていません。
+            您的浏览器不支持音频元素
         </audio>
         
         <div class="controls">
@@ -415,6 +469,7 @@
         const waveform = document.getElementById('waveform');
         const prevButton = document.getElementById('prevButton');
         const nextButton = document.getElementById('nextButton');
+        const artistFilter = document.getElementById('artistFilter');
         
         // 初始化时间显示
         currentTimeDisplay.textContent = formatTime(0);
@@ -510,8 +565,8 @@
                     waveform.classList.add('music-playing');
                 })
                 .catch((error) => {
-                    console.error('Ciallo～(∠・ω< )⌒☆:', error);
-                    alert('Ciallo～(∠・ω< )⌒☆');
+                    console.error('播放错误:', error);
+                    alert('播放失败，请选择歌曲');
                 });
         }
         
@@ -605,6 +660,32 @@
             }
         }
         
+        // 歌手分类功能
+        function filterByArtist(artist) {
+            // 重置所有按钮状态
+            document.querySelectorAll('.artist-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 激活当前按钮
+            event.target.classList.add('active');
+            
+            // 重置歌曲选择为默认
+            songSelect.selectedIndex = 0;
+            
+            // 显示或隐藏歌曲选项
+            for (let i = 1; i < songSelect.options.length; i++) {
+                const option = songSelect.options[i];
+                const artists = option.getAttribute('data-artist').split(',');
+                
+                if (artist === 'all' || artists.includes(artist)) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+        }
+        
         // 添加事件监听器
         songSelect.addEventListener('change', changeSong);
         playPauseButton.addEventListener('click', togglePlayPause);
@@ -613,6 +694,14 @@
         volumeRange.addEventListener('input', setVolume);
         volumeIcon.addEventListener('click', toggleMute);
         progressBar.addEventListener('input', seekTo);
+        
+        // 为歌手按钮添加事件
+        artistFilter.addEventListener('click', (e) => {
+            if (e.target.classList.contains('artist-btn')) {
+                const artist = e.target.getAttribute('data-artist');
+                filterByArtist(artist);
+            }
+        });
         
         musicPlayer.addEventListener('timeupdate', () => {
             updateProgressBar();
@@ -640,7 +729,7 @@
         
         musicPlayer.addEventListener('error', () => {
             hideLoadingSpinner();
-            alert('你曲没了');
+            alert('歌曲加载失败，请重试');
         });
         
         // 初始化
