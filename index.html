@@ -19,8 +19,8 @@
         }
         .player-container {
             text-align: center;
-            background-color: rgba(255, 255, 255, 0.1); /* 半透明背景 */
-            backdrop-filter: blur(10px); /* 亚克力效果 */
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
@@ -41,14 +41,12 @@
             color: #333;
         }
         audio {
-            width: 100%;
-            margin-top: 20px;
-            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
         }
         input[type="range"] {
             width: 100%;
             margin-top: 20px;
-            -webkit-appearance: none; /* 移除默认样式 */
+            -webkit-appearance: none;
             appearance: none;
             background: #eee;
             height: 5px;
@@ -66,31 +64,77 @@
         input[type="range"]:focus {
             outline: none;
         }
-        button {
-            margin: 5px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
         img {
             max-width: 100%;
             border-radius: 10px;
             margin-bottom: 20px;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: #fff;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .controls i {
+            font-size: 24px;
+            cursor: pointer;
+            color: #fff;
+            transition: color 0.3s ease;
+            margin: 0 10px;
+        }
+        .controls i:hover {
+            color: #0056b3;
+        }
+        .volume-control {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+        .volume-range {
+            width: 100px;
+        }
+        .loading-spinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-left-color: #007bff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg) translate(-50%, -50%);
+            }
         }
         .creator-info {
             margin-top: 20px;
             font-size: 14px;
             color: #fff;
         }
+        .social-links a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .social-links a:hover {
+            color: #0056b3;
+        }
+        .social-icon {
+            margin-left: 5px;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="player-container">
@@ -104,15 +148,28 @@
         <br>
         <img id="albumCover" src="assets/default_cover.jpg" alt="专辑封面">
         <input type="range" id="progressBar" min="0" max="100" value="0" oninput="seekTo()" style="width: 100%;">
-        <audio id="musicPlayer" controls>
+        <div class="time-display">
+            <span id="currentTime">00:00</span>
+            <span id="totalTime">00:00</span>
+        </div>
+        <audio id="musicPlayer">
             <source src="" type="audio/mpeg">
-            您的浏览器不支持 audio 元素。
+            您のブラウザ不サポート audio 元素。
         </audio>
-        <br>
-        <button onclick="playMusic()">播放</button>
-        <button onclick="pauseMusic()">暂停</button>
+        <div class="controls">
+            <i id="playPauseButton" class="fas fa-play" onclick="togglePlayPause()"></i>
+            <div class="volume-control">
+                <i id="volumeIcon" class="fas fa-volume-up" onclick="toggleMute()"></i>
+                <input type="range" id="volumeRange" class="volume-range" min="0" max="1" step="0.01" value="1" oninput="setVolume()">
+            </div>
+        </div>
+        <div class="loading-spinner" id="loadingSpinner"></div>
         <div class="creator-info">
             制作人 : Miku_AP QQ:1339891589
+            <span class="social-links">
+                <a href="https://space.bilibili.com/561893322" target="_blank"><i class="fab fa-bilibili social-icon"></i></a>
+                <a href="https://github.com/suebro/surbro.github.io" target="_blank"><i class="fab fa-github social-icon"></i></a>
+            </span>
         </div>
     </div>
 
@@ -121,11 +178,20 @@
         const progressBar = document.getElementById('progressBar');
         const songSelect = document.getElementById('songSelect');
         const albumCover = document.getElementById('albumCover');
-        let updateProgressInterval;
+        const playPauseButton = document.getElementById('playPauseButton');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const totalTimeDisplay = document.getElementById('totalTime');
+        const volumeRange = document.getElementById('volumeRange');
+        const volumeIcon = document.getElementById('volumeIcon');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
 
         function changeSong() {
-            clearInterval(updateProgressInterval);
-
             const selectedOption = songSelect.options[songSelect.selectedIndex];
             const selectedSong = selectedOption.value;
             const coverImage = selectedOption.getAttribute('data-cover');
@@ -134,54 +200,81 @@
                 musicPlayer.src = selectedSong;
                 musicPlayer.load();
                 albumCover.src = coverImage;
-                updateProgressBar();
+                albumCover.style.opacity = 0;
+                setTimeout(() => {
+                    albumCover.style.opacity = 1;
+                }, 10);
+                showLoadingSpinner();
             } else {
                 musicPlayer.src = '';
-                albumCover.src = 'assets/default_cover.jpg'; // 默认封面
+                albumCover.src = 'assets/default_cover.jpg';
+                hideLoadingSpinner();
+            }
+        }
+
+        function togglePlayPause() {
+            if (musicPlayer.paused || musicPlayer.ended) {
+                playMusic();
+            } else {
+                pauseMusic();
             }
         }
 
         function playMusic() {
             musicPlayer.play();
+            playPauseButton.classList.remove('fa-play');
+            playPauseButton.classList.add('fa-pause');
         }
 
         function pauseMusic() {
             musicPlayer.pause();
+            playPauseButton.classList.remove('fa-pause');
+            playPauseButton.classList.add('fa-play');
         }
 
         function updateProgressBar() {
-            progressBar.max = musicPlayer.duration;
-            progressBar.value = musicPlayer.currentTime;
-
             if (!isNaN(musicPlayer.duration)) {
-                progressBar.style.width = '100%';
+                progressBar.max = musicPlayer.duration;
+                progressBar.value = (musicPlayer.currentTime / musicPlayer.duration) * 100;
+                currentTimeDisplay.textContent = formatTime(musicPlayer.currentTime);
+                totalTimeDisplay.textContent = formatTime(musicPlayer.duration);
             }
-
-            if (musicPlayer.paused || musicPlayer.ended) {
-                clearInterval(updateProgressInterval);
-                return;
-            }
-
-            updateProgressInterval = setInterval(() => {
-                progressBar.value = musicPlayer.currentTime;
-                if (musicPlayer.ended) {
-                    clearInterval(updateProgressInterval);
-                }
-            }, 1000);
         }
-
-        musicPlayer.addEventListener('timeupdate', () => {
-            updateProgressBar();
-        });
 
         function seekTo() {
-            const seekTime = progressBar.value;
-            musicPlayer.currentTime = seekTime;
+            musicPlayer.currentTime = (progressBar.value / 100) * musicPlayer.duration;
         }
 
+        function setVolume() {
+            musicPlayer.volume = volumeRange.value;
+            updateVolumeIcon();
+        }
+
+        function toggleMute() {
+            musicPlayer.muted = !musicPlayer.muted;
+            volumeRange.value = musicPlayer.muted ? 0 : volumeRange.value;
+            updateVolumeIcon();
+        }
+
+        function updateVolumeIcon() {
+            volumeIcon.classList.toggle('fa-volume-up', !musicPlayer.muted && volumeRange.value > 0);
+            volumeIcon.classList.toggle('fa-volume-mute', musicPlayer.muted || volumeRange.value === 0);
+        }
+
+        function showLoadingSpinner() {
+            loadingSpinner.style.display = 'block';
+        }
+
+        function hideLoadingSpinner() {
+            loadingSpinner.style.display = 'none';
+        }
+
+        musicPlayer.addEventListener('timeupdate', updateProgressBar);
         musicPlayer.addEventListener('loadedmetadata', () => {
             updateProgressBar();
+            hideLoadingSpinner();
         });
+        volumeRange.addEventListener('input', setVolume);
     </script>
 </body>
 </html>
