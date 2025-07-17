@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Music Player</title>
+    <title>简易音乐播放器</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -48,7 +48,7 @@
         input[type="range"] {
             width: 100%;
             margin-top: 20px;
-            -webkit-appearance: none; /* Remove default styling */
+            -webkit-appearance: none; /* 移除默认样式 */
             appearance: none;
             background: #eee;
             height: 5px;
@@ -96,23 +96,24 @@
     <div class="player-container">
         <h1>术力口歌曲试听播放网站</h1>
         <select id="songSelect" onchange="changeSong()">
-            <option data-cover="assets/OIP-C.jpg" value="">选歌列表</option>
+            <option data-cover="assets/default_cover.jpg" value="">选歌列表</option>
             <option data-cover="assets/shino_cover.png" value="songs/Shino,初音ミク - バケモノの唄.mp3">Shino,初音ミク - バケモノの唄</option>
             <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - でんでん心電図.mp3">ぺぽよ - でんでん心電図</option>
-            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - 失态生态实验体.mp3">ぺぽよ - 失态生态实验体</option>
+            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - 失態生態実験体.mp3">ぺぽよ - 失態生態実験体</option>
         </select>
         <br>
-        <img id="albumCover" src="" alt="Album Cover">
+        <img id="albumCover" src="assets/default_cover.jpg" alt="专辑封面">
         <input type="range" id="progressBar" min="0" max="100" value="0" oninput="seekTo()" style="width: 100%;">
         <audio id="musicPlayer" controls>
             <source src="" type="audio/mpeg">
-            Your browser does not support the audio element.
+            您的浏览器不支持 audio 元素。
         </audio>
         <br>
         <button onclick="playMusic()">播放</button>
         <button onclick="pauseMusic()">暂停</button>
         <div class="creator-info">
-            Made By :Miku_AP QQ:1339891589
+            制作人 : Miku_AP QQ:1339891589
+        </div>
     </div>
 
     <script>
@@ -136,7 +137,7 @@
                 updateProgressBar();
             } else {
                 musicPlayer.src = '';
-                albumCover.src = '';
+                albumCover.src = 'assets/default_cover.jpg'; // 默认封面
             }
         }
 
