@@ -19,14 +19,15 @@
         }
         .player-container {
             text-align: center;
-            background-color: rgba(255, 255, 255, 0.9); /* 半透明背景 */
+            background-color: rgba(255, 255, 255, 0.1); /* 半透明背景 */
+            backdrop-filter: blur(10px); /* 亚克力效果 */
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             width: 400px;
         }
         h1 {
-            color: #333;
+            color: #fff;
             margin-bottom: 20px;
         }
         select {
@@ -36,10 +37,13 @@
             border-radius: 5px;
             font-size: 16px;
             margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #333;
         }
         audio {
             width: 100%;
             margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
         }
         input[type="range"] {
             width: 100%;
@@ -76,16 +80,24 @@
         button:hover {
             background-color: #0056b3;
         }
+        img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="player-container">
         <h1>My Simple Music Player</h1>
         <select id="songSelect" onchange="changeSong()">
-            <option value="">Select a song</option>
-            <option value="songs/Shino,初音ミク - バケモノの唄.mp3">Shino,初音ミク - バケモノの唄</option>
-            <option value="songs/ぺぽよ - でんでん心電図.mp3">ぺぽよ - でんでん心電図</option>
+            <option data-cover="assets/" value="">Select a song</option>
+            <option data-cover="assets/shino_cover.png" value="songs/Shino,初音ミク - バケモノの唄.mp3">Shino,初音ミク - バケモノの唄</option>
+            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - でんでん心電図.mp3">ぺぽよ - でんでん心電図</option>
+            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - 失态生态实验体.mp3">ぺぽよ - 失态生态实验体</option>
+        </select>
         <br>
+        <img id="albumCover" src="" alt="Album Cover">
         <input type="range" id="progressBar" min="0" max="100" value="0" oninput="seekTo()" style="width: 100%;">
         <audio id="musicPlayer" controls>
             <source src="" type="audio/mpeg">
@@ -100,15 +112,24 @@
         const musicPlayer = document.getElementById('musicPlayer');
         const progressBar = document.getElementById('progressBar');
         const songSelect = document.getElementById('songSelect');
+        const albumCover = document.getElementById('albumCover');
+        let updateProgressInterval;
 
         function changeSong() {
-            const selectedSong = songSelect.value;
+            clearInterval(updateProgressInterval);
+
+            const selectedOption = songSelect.options[songSelect.selectedIndex];
+            const selectedSong = selectedOption.value;
+            const coverImage = selectedOption.getAttribute('data-cover');
+
             if (selectedSong) {
                 musicPlayer.src = selectedSong;
                 musicPlayer.load();
+                albumCover.src = coverImage;
                 updateProgressBar();
             } else {
                 musicPlayer.src = '';
+                albumCover.src = '';
             }
         }
 
@@ -133,7 +154,7 @@
                 return;
             }
 
-            let updateProgressInterval = setInterval(() => {
+            updateProgressInterval = setInterval(() => {
                 progressBar.value = musicPlayer.currentTime;
                 if (musicPlayer.ended) {
                     clearInterval(updateProgressInterval);
