@@ -3,104 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>简易音乐播放器</title>
+    <title>術力口歌曲試聴プレイヤー</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-image: url('assets/background.jpg'); /* 使用本地背景图像 */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            padding: 20px;
+            overflow-x: hidden;
+            color: #fff;
         }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
         .player-container {
             text-align: center;
             background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 400px;
+            backdrop-filter: blur(12px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .player-container::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
+        }
+        
         h1 {
-            color: #fff;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, #ff7eb3, #ff758c, #ff7eb3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+        
+        .song-info {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            height: 1.8rem;
+            color: #e6e6ff;
+        }
+        
         select {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
             font-size: 16px;
-            margin-bottom: 15px;
-            background-color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
             color: #333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 12px;
+            cursor: pointer;
         }
+        
+        select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+        }
+        
         audio {
             display: none;
         }
-        input[type="range"] {
-            width: 100%;
-            margin-top: 15px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: #eee;
-            height: 5px;
-            border-radius: 5px;
+        
+        .cover-container {
+            position: relative;
+            margin: 0 auto 20px;
+            width: 250px;
+            height: 250px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
         }
-        input[type="range"]::-webkit-slider-thumb {
+        
+        #albumCover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s ease-in-out;
+            border-radius: 15px;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        #progressBar {
+            width: 100%;
+            margin: 0;
             -webkit-appearance: none;
             appearance: none;
-            width: 15px;
-            height: 15px;
-            background: #007bff;
+            background: rgba(255, 255, 255, 0.3);
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        #progressBar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #fff;
             border-radius: 50%;
             cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
         }
-        input[type="range"]:focus {
-            outline: none;
+        
+        #progressBar::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #ff7eb3;
         }
-        img {
-            max-width: 100%;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            transition: opacity 0.5s ease-in-out;
-        }
+        
         .time-display {
             display: flex;
             justify-content: space-between;
             margin-top: 10px;
-            color: #fff;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
         }
+        
         .controls {
-            margin-top: 15px;
+            margin-top: 25px;
             display: flex;
             justify-content: center;
             align-items: center;
+            gap: 25px;
         }
+        
         .controls i {
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
             color: #fff;
-            transition: color 0.3s ease;
-            margin: 0 10px;
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
+        
         .controls i:hover {
-            color: #0056b3;
+            color: #ff7eb3;
+            transform: scale(1.15);
         }
+        
         .volume-control {
             display: flex;
             align-items: center;
-            margin-left: 20px;
+            gap: 10px;
         }
+        
         .volume-range {
             width: 100px;
         }
+        
+        .creator-info {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .social-links {
+            margin-top: 8px;
+        }
+        
+        .social-links a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 8px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: #ff7eb3;
+            transform: scale(1.1);
+        }
+        
+        .waveform {
+            height: 60px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin: 15px 0;
+        }
+        
+        .wave-bar {
+            width: 4px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 2px;
+            animation: wave 1.2s ease-in-out infinite;
+            animation-play-state: paused;
+        }
+        
+        .wave-bar:nth-child(2n) {
+            animation-delay: 0.2s;
+            height: 30px;
+        }
+        
+        .wave-bar:nth-child(3n) {
+            animation-delay: 0.4s;
+            height: 40px;
+        }
+        
+        .wave-bar:nth-child(5n) {
+            animation-delay: 0.6s;
+            height: 50px;
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: scaleY(0.6); }
+            50% { transform: scaleY(1.2); }
+        }
+        
+        .music-playing .wave-bar {
+            animation-play-state: running;
+        }
+        
         .loading-spinner {
             display: none;
             position: absolute;
@@ -108,99 +267,137 @@
             left: 50%;
             transform: translate(-50%, -50%);
             border: 8px solid rgba(255, 255, 255, 0.3);
-            border-left-color: #007bff;
+            border-top: 8px solid #ff7eb3;
             border-radius: 50%;
             width: 50px;
             height: 50px;
             animation: spin 1s linear infinite;
+            z-index: 10;
         }
+        
         @keyframes spin {
-            to {
-                transform: rotate(360deg) translate(-50%, -50%);
-            }
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
-        .creator-info {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #fff;
-        }
-        .social-links a {
-            color: #fff;
-            text-decoration: none;
-        }
-        .social-links a:hover {
-            color: #0056b3;
-        }
-        .social-icon {
-            margin-left: 5px;
-        }
-
+        
         /* 响应式设计 */
         @media (max-width: 600px) {
             .player-container {
-                padding: 15px;
+                padding: 20px;
             }
+            
             h1 {
-                font-size: 1.5em;
+                font-size: 1.6rem;
             }
-            select {
-                font-size: 14px;
+            
+            .cover-container {
+                width: 200px;
+                height: 200px;
             }
-            input[type="range"] {
-                margin-top: 10px;
+            
+            .controls {
+                gap: 20px;
             }
+            
             .controls i {
-                font-size: 20px;
-                margin: 0 8px;
+                font-size: 24px;
             }
-            .volume-range {
-                width: 80px;
+        }
+        
+        @media (max-width: 400px) {
+            .cover-container {
+                width: 180px;
+                height: 180px;
             }
-            .creator-info {
-                font-size: 12px;
+            
+            .controls {
+                gap: 15px;
             }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="player-container">
-        <h1>术力口歌曲试听播放网站</h1>
-        <select id="songSelect" onchange="changeSong()">
-            <option data-cover="assets/default_cover.jpg" value="">选歌列表</option>
-            <option data-cover="assets/shino_cover.png" value="songs/Shino,初音ミク - バケモノの唄.mp3">Shino,初音ミク - バケモノの唄</option>
-            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - でんでん心電図.mp3">ぺぽよ - でんでん心電図</option>
-            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - 失態生態実験体.mp3">ぺぽよ - 失態生態実験体</option>
+        <h1>🎵 術力口歌曲試聴プレイヤー</h1>
+        
+        <div class="song-info" id="songTitle">曲を選択してください</div>
+        
+        <select id="songSelect">
+            <option data-cover="assets/default_cover.jpg" value="" data-title="選歌リスト">選歌リスト</option>
+            <option data-cover="assets/shino_cover.png" value="songs/Shino,初音ミク - バケモノの唄.mp3" data-title="Shino,初音ミク - バケモノの唄">Shino,初音ミク - バケモノの唄</option>
+            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - でんでん心電図.mp3" data-title="ぺぽよ - でんでん心電図">ぺぽよ - でんでん心電図</option>
+            <option data-cover="assets/pepoyo_cover.jpg" value="songs/ぺぽよ - 失態生態実験体.mp3" data-title="ぺぽよ - 失態生態実験体">ぺぽよ - 失態生態実験体</option>
+            <option data-cover="assets/12.png" value="songs/bk & 重音テト - 臙脂 ft. 重音テト.mp3" data-title="bk & 重音テト - 臙脂 ft. 重音テト">bk & 重音テト - 臙脂 ft. 重音テト
         </select>
-        <br>
-        <img id="albumCover" src="assets/default_cover.jpg" alt="专辑封面">
-        <input type="range" id="progressBar" min="0" max="100" value="0" oninput="seekTo()" style="width: 100%;">
-        <div class="time-display">
-            <span id="currentTime">00:00</span>
-            <span id="totalTime">00:00</span>
+        
+        <div class="cover-container">
+            <img id="albumCover" src="assets/default_cover.jpg" alt="アルバムカバー">
+            <div class="loading-spinner" id="loadingSpinner"></div>
         </div>
-        <audio id="musicPlayer">
-            <source src="" type="audio/mpeg">
-            您のブラウザ不サポート audio 元素。
-        </audio>
-        <div class="controls">
-            <i id="playPauseButton" class="fas fa-play" onclick="togglePlayPause()"></i>
-            <div class="volume-control">
-                <i id="volumeIcon" class="fas fa-volume-up" onclick="toggleMute()"></i>
-                <input type="range" id="volumeRange" class="volume-range" min="0" max="1" step="0.01" value="1" oninput="setVolume()">
+        
+        <div class="waveform" id="waveform">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+        </div>
+        
+        <div class="progress-container">
+            <input type="range" id="progressBar" min="0" max="100" value="0">
+            <div class="time-display">
+                <span id="currentTime">00:00</span>
+                <span id="totalTime">00:00</span>
             </div>
         </div>
-        <div class="loading-spinner" id="loadingSpinner"></div>
+        
+        <audio id="musicPlayer">
+            <source src="" type="audio/mpeg">
+            お使いのブラウザはオーディオ要素をサポートしていません。
+        </audio>
+        
+        <div class="controls">
+            <i id="prevButton" class="fas fa-step-backward"></i>
+            <i id="playPauseButton" class="fas fa-play"></i>
+            <i id="nextButton" class="fas fa-step-forward"></i>
+            
+            <div class="volume-control">
+                <i id="volumeIcon" class="fas fa-volume-up"></i>
+                <input type="range" id="volumeRange" class="volume-range" min="0" max="1" step="0.01" value="1">
+            </div>
+        </div>
+        
         <div class="creator-info">
-            制作人 : Miku_AP QQ:1339891589
-            <span class="social-links">
-                <a href="https://space.bilibili.com/561893322" target="_blank"><i class="fab fa-bilibili social-icon"></i></a>
-                <a href="https://github.com/suebro/surbro.github.io" target="_blank"><i class="fab fa-github social-icon"></i></a>
-            </span>
+            <div>制作人 : Miku_AP QQ:1339891589</div>
+            <div class="social-links">
+                <a href="https://space.bilibili.com/561893322" target="_blank" title="Bilibili">
+                    <i class="fab fa-bilibili"></i>
+                </a>
+                <a href="https://github.com/suebro/surbro.github.io" target="_blank" title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="#" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" title="YouTube">
+                    <i class="fab fa-youtube"></i>
+                </a>
+            </div>
         </div>
     </div>
 
     <script>
+        // 获取DOM元素
         const musicPlayer = document.getElementById('musicPlayer');
         const progressBar = document.getElementById('progressBar');
         const songSelect = document.getElementById('songSelect');
@@ -211,34 +408,74 @@
         const volumeRange = document.getElementById('volumeRange');
         const volumeIcon = document.getElementById('volumeIcon');
         const loadingSpinner = document.getElementById('loadingSpinner');
-
+        const songTitle = document.getElementById('songTitle');
+        const waveform = document.getElementById('waveform');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        
+        // 初始化时间显示
+        currentTimeDisplay.textContent = formatTime(0);
+        totalTimeDisplay.textContent = formatTime(0);
+        
+        // 更新歌曲标题
+        function updateSongTitle(title) {
+            songTitle.textContent = title;
+        }
+        
+        // 格式化时间显示
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60);
             return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
-
+        
+        // 切换歌曲
         function changeSong() {
             const selectedOption = songSelect.options[songSelect.selectedIndex];
             const selectedSong = selectedOption.value;
             const coverImage = selectedOption.getAttribute('data-cover');
-
+            const songName = selectedOption.getAttribute('data-title');
+            
+            // 更新歌曲标题
+            updateSongTitle(songName);
+            
+            // 停止当前播放并重置UI
+            musicPlayer.pause();
+            playPauseButton.classList.remove('fa-pause');
+            playPauseButton.classList.add('fa-play');
+            waveform.classList.remove('music-playing');
+            
             if (selectedSong) {
+                // 显示加载动画
+                showLoadingSpinner();
+                
+                // 使用本地文件路径
                 musicPlayer.src = selectedSong;
                 musicPlayer.load();
                 albumCover.src = coverImage;
                 albumCover.style.opacity = 0;
+                
                 setTimeout(() => {
                     albumCover.style.opacity = 1;
                 }, 10);
-                showLoadingSpinner();
+                
+                // 重置进度条
+                progressBar.value = 0;
+                currentTimeDisplay.textContent = formatTime(0);
+                totalTimeDisplay.textContent = formatTime(0);
             } else {
                 musicPlayer.src = '';
                 albumCover.src = 'assets/default_cover.jpg';
+                // 重置进度条和时间显示
+                progressBar.value = 0;
+                currentTimeDisplay.textContent = formatTime(0);
+                totalTimeDisplay.textContent = formatTime(0);
                 hideLoadingSpinner();
+                updateSongTitle('曲を選択してください');
             }
         }
-
+        
+        // 播放/暂停切换
         function togglePlayPause() {
             if (musicPlayer.paused || musicPlayer.ended) {
                 playMusic();
@@ -246,65 +483,165 @@
                 pauseMusic();
             }
         }
-
+        
+        // 播放音乐
         function playMusic() {
-            musicPlayer.play();
-            playPauseButton.classList.remove('fa-play');
-            playPauseButton.classList.add('fa-pause');
+            if (!musicPlayer.src) {
+                // 如果没有选择歌曲，自动选择第一首
+                songSelect.selectedIndex = 1;
+                changeSong();
+                
+                // 添加一个小的延迟以确保歌曲加载
+                setTimeout(() => {
+                    if (musicPlayer.src) {
+                        playMusic();
+                    }
+                }, 200);
+                return;
+            }
+            
+            musicPlayer.play()
+                .then(() => {
+                    playPauseButton.classList.remove('fa-play');
+                    playPauseButton.classList.add('fa-pause');
+                    waveform.classList.add('music-playing');
+                })
+                .catch((error) => {
+                    console.error('再生エラー:', error);
+                    alert('再生に失敗しました、曲を選択してください');
+                });
         }
-
+        
+        // 暂停音乐
         function pauseMusic() {
             musicPlayer.pause();
             playPauseButton.classList.remove('fa-pause');
             playPauseButton.classList.add('fa-play');
+            waveform.classList.remove('music-playing');
         }
-
+        
+        // 修复进度条问题
         function updateProgressBar() {
-            if (!isNaN(musicPlayer.duration)) {
-                progressBar.max = musicPlayer.duration;
-                progressBar.value = (musicPlayer.currentTime / musicPlayer.duration) * 100;
+            if (musicPlayer.duration && !isNaN(musicPlayer.duration)) {
+                const percentage = (musicPlayer.currentTime / musicPlayer.duration) * 100;
+                progressBar.value = percentage;
                 currentTimeDisplay.textContent = formatTime(musicPlayer.currentTime);
+                
+                // 确保总时间正确显示
                 totalTimeDisplay.textContent = formatTime(musicPlayer.duration);
             }
         }
-
+        
+        // 跳转到指定时间
         function seekTo() {
-            musicPlayer.currentTime = (progressBar.value / 100) * musicPlayer.duration;
+            if (musicPlayer.duration && !isNaN(musicPlayer.duration)) {
+                const seekTime = (progressBar.value / 100) * musicPlayer.duration;
+                musicPlayer.currentTime = seekTime;
+            }
         }
-
+        
+        // 设置音量
         function setVolume() {
             musicPlayer.volume = volumeRange.value;
             updateVolumeIcon();
         }
-
+        
+        // 静音切换
         function toggleMute() {
             musicPlayer.muted = !musicPlayer.muted;
-            volumeRange.value = musicPlayer.muted ? 0 : volumeRange.value;
+            volumeRange.value = musicPlayer.muted ? 0 : musicPlayer.volume;
             updateVolumeIcon();
         }
-
+        
+        // 更新音量图标
         function updateVolumeIcon() {
-            volumeIcon.classList.toggle('fa-volume-up', !musicPlayer.muted && volumeRange.value > 0);
-            volumeIcon.classList.toggle('fa-volume-mute', musicPlayer.muted || volumeRange.value === 0);
+            if (musicPlayer.muted || volumeRange.value == 0) {
+                volumeIcon.classList.remove('fa-volume-up', 'fa-volume-down');
+                volumeIcon.classList.add('fa-volume-mute');
+            } else if (volumeRange.value > 0.5) {
+                volumeIcon.classList.remove('fa-volume-mute', 'fa-volume-down');
+                volumeIcon.classList.add('fa-volume-up');
+            } else {
+                volumeIcon.classList.remove('fa-volume-mute', 'fa-volume-up');
+                volumeIcon.classList.add('fa-volume-down');
+            }
         }
-
+        
+        // 显示加载动画
         function showLoadingSpinner() {
             loadingSpinner.style.display = 'block';
         }
-
+        
+        // 隐藏加载动画
         function hideLoadingSpinner() {
             loadingSpinner.style.display = 'none';
         }
-
-        musicPlayer.addEventListener('timeupdate', updateProgressBar);
-        musicPlayer.addEventListener('loadedmetadata', () => {
-            updateProgressBar();
-            hideLoadingSpinner();
-        });
+        
+        // 上一曲
+        function prevSong() {
+            const currentIndex = songSelect.selectedIndex;
+            if (currentIndex > 1) {
+                songSelect.selectedIndex = currentIndex - 1;
+                changeSong();
+                playMusic();
+            }
+        }
+        
+        // 下一曲
+        function nextSong() {
+            const currentIndex = songSelect.selectedIndex;
+            if (currentIndex < songSelect.options.length - 1) {
+                songSelect.selectedIndex = currentIndex + 1;
+                changeSong();
+                playMusic();
+            } else if (currentIndex === songSelect.options.length - 1) {
+                // 如果是最后一首，回到第一首
+                songSelect.selectedIndex = 1;
+                changeSong();
+                playMusic();
+            }
+        }
+        
+        // 添加事件监听器
+        songSelect.addEventListener('change', changeSong);
+        playPauseButton.addEventListener('click', togglePlayPause);
+        prevButton.addEventListener('click', prevSong);
+        nextButton.addEventListener('click', nextSong);
         volumeRange.addEventListener('input', setVolume);
+        volumeIcon.addEventListener('click', toggleMute);
+        progressBar.addEventListener('input', seekTo);
+        
+        musicPlayer.addEventListener('timeupdate', () => {
+            updateProgressBar();
+        });
+        
+        musicPlayer.addEventListener('loadedmetadata', () => {
+            // 确保总时间正确显示
+            totalTimeDisplay.textContent = formatTime(musicPlayer.duration);
+            hideLoadingSpinner();
+            
+            // 如果之前正在播放，继续播放
+            if (playPauseButton.classList.contains('fa-pause')) {
+                musicPlayer.play();
+            }
+        });
+        
+        musicPlayer.addEventListener('ended', () => {
+            playPauseButton.classList.remove('fa-pause');
+            playPauseButton.classList.add('fa-play');
+            waveform.classList.remove('music-playing');
+            
+            // 自动播放下一首
+            nextSong();
+        });
+        
+        musicPlayer.addEventListener('error', () => {
+            hideLoadingSpinner();
+            alert('曲の読み込みに失敗しました、再試行するか他の曲を選択してください');
+        });
+        
+        // 初始化
+        updateVolumeIcon();
     </script>
 </body>
 </html>
-
-
-
