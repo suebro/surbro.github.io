@@ -37,12 +37,17 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end));
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            /* background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end)); */
+            background-image: url('assets/bg.jpg'); /* 替换为你的图片路径 */
+            background-size: cover; /* 确保背景图片覆盖整个屏幕 */
+            background-position: center; /* 居中显示 */
+            background-repeat: no-repeat; /* 防止重复 */
             padding: 20px;
             overflow-x: hidden;
             color: var(--text-color);
+            
+            /* 添加模糊效果 */
+            /* backdrop-filter: blur(5px); */
         }
         
         @keyframes gradientBG {
@@ -82,6 +87,7 @@
             letter-spacing: 1px;
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--primary-color));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
@@ -105,10 +111,9 @@
             max-height: 120px;
             overflow-y: auto;
             padding: 5px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary-color) transparent;
         }
         
+        /* For Chrome, Safari and Opera */
         .artist-filter::-webkit-scrollbar {
             width: 6px;
         }
@@ -116,6 +121,15 @@
         .artist-filter::-webkit-scrollbar-thumb {
             background-color: var(--primary-color);
             border-radius: 3px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3); /* 添加阴影 */
+        }
+        
+        .artist-filter::-webkit-scrollbar-thumb:hover {
+            background-color: var(--secondary-color); /* hover时颜色变化 */
+        }
+        
+        .artist-filter::-webkit-scrollbar-track {
+            background-color: rgba(0, 0, 0, 0.1); /* 增加背景颜色 */
         }
         
         .artist-btn {
@@ -166,7 +180,8 @@
         .search-icon {
             position: absolute;
             left: 15px;
-            top: 50px;
+            top: 20px;
+            transform: translateY(-50%);
             color: rgba(255, 255, 255, 0.6);
             font-size: 16px;
         }
@@ -179,7 +194,6 @@
             overflow-y: auto;
             padding: 5px;
             scrollbar-width: thin;
-            scrollbar-color: var(--primary-color) transparent;
         }
         
         .song-list::-webkit-scrollbar {
@@ -189,6 +203,15 @@
         .song-list::-webkit-scrollbar-thumb {
             background-color: var(--primary-color);
             border-radius: 3px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3); /* 添加阴影 */
+        }
+        
+        .song-list::-webkit-scrollbar-thumb:hover {
+            background-color: var(--secondary-color); /* hover时颜色变化 */
+        }
+        
+        .song-list::-webkit-scrollbar-track {
+            background-color: rgba(0, 0, 0, 0.1); /* 增加背景颜色 */
         }
         
         .song-card {
@@ -510,28 +533,29 @@
         }
         
         /* 响应式设计 */
-        @media (max-width: 900px) {
+        @media (max-width: 1200px) {
             .player-container {
-                max-width: 600px;
-            }
-            
-            .song-list {
-                grid-template-columns: 1fr;
+                max-width: 900px;
             }
         }
         
-        @media (max-width: 600px) {
+        @media (max-width: 992px) {
             .player-container {
-                padding: 20px;
+                max-width: 700px;
+                padding: 25px;
             }
             
             h1 {
-                font-size: 1.6rem;
+                font-size: 1.8rem;
+            }
+            
+            .song-info {
+                font-size: 1.1rem;
             }
             
             .cover-container {
-                width: 200px;
-                height: 200px;
+                width: 220px;
+                height: 220px;
             }
             
             .main-controls {
@@ -539,17 +563,45 @@
             }
             
             .controls i {
-                font-size: 22px;
+                font-size: 23px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .player-container {
+                max-width: 550px;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .song-info {
+                font-size: 1rem;
+            }
+            
+            .cover-container {
+                width: 190px;
+                height: 190px;
+            }
+            
+            .main-controls {
+                gap: 15px;
+            }
+            
+            .controls i {
+                font-size: 21px;
             }
             
             .artist-btn {
                 padding: 6px 12px;
-                font-size: 12px;
+                font-size: 13px;
             }
             
             .play-mode {
-                width: 36px;
-                height: 36px;
+                width: 34px;
+                height: 34px;
             }
             
             .song-card {
@@ -557,18 +609,150 @@
             }
         }
         
-        @media (max-width: 400px) {
+        @media (max-width: 576px) {
+            .player-container {
+                max-width: 400px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+            }
+            
+            .song-info {
+                font-size: 0.9rem;
+            }
+            
             .cover-container {
-                width: 180px;
-                height: 180px;
+                width: 160px;
+                height: 160px;
             }
             
             .main-controls {
-                gap: 15px;
+                gap: 12px;
+            }
+            
+            .controls i {
+                font-size: 19px;
             }
             
             .artist-filter {
-                max-height: 100px;
+                max-height: 90px;
+            }
+            
+            .song-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .song-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .song-card-cover {
+                width: 45px;
+                height: 45px;
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            
+            .song-card-info {
+                text-align: left;
+            }
+            
+            .song-card-title {
+                font-size: 13px;
+                margin-bottom: 2px;
+            }
+            
+            .song-card-artist {
+                font-size: 11px;
+            }
+            
+            .song-card-duration {
+                font-size: 11px;
+                padding: 0;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .player-container {
+                max-width: 320px;
+            }
+            
+            .cover-container {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .main-controls {
+                gap: 10px;
+            }
+            
+            .artist-filter {
+                max-height: 80px;
+            }
+        }
+
+        /* 手机端优化歌单样式 */
+        @media (max-width: 600px) {
+            .song-list {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                max-height: 220px;
+                padding: 2px;
+            }
+            .song-card {
+                flex-direction: row;
+                align-items: center;
+                padding: 7px;
+                border-radius: 10px;
+                font-size: 13px;
+            }
+            .song-card-cover {
+                width: 38px;
+                height: 38px;
+                margin-right: 8px;
+                border-radius: 6px;
+            }
+            .song-card-info {
+                font-size: 13px;
+            }
+            .song-card-title {
+                font-size: 13px;
+                margin-bottom: 2px;
+            }
+            .song-card-artist {
+                font-size: 11px;
+            }
+            .song-card-duration {
+                font-size: 11px;
+                padding: 0 4px;
+            }
+        }
+
+        /* 超小屏幕进一步优化 */
+        @media (max-width: 400px) {
+            .song-list {
+                max-height: 160px;
+                gap: 7px;
+            }
+            .song-card {
+                padding: 5px;
+                font-size: 12px;
+            }
+            .song-card-cover {
+                width: 32px;
+                height: 32px;
+                margin-right: 6px;
+                border-radius: 5px;
+            }
+            .song-card-title {
+                font-size: 12px;
+            }
+            .song-card-artist,
+            .song-card-duration {
+                font-size: 10px;
             }
         }
     </style>
@@ -716,7 +900,7 @@
             {
                 cover: "assets/shino_cover.png",
                 src: "songs/Shino,初音ミク - バケモノの唄.mp3",
-                title: "Shino,初音ミク - バケモノの唄",
+                title: "バケモノの唄",
                 artist: "Shino,初音ミク",
                 duration: "3:45",
                 display: true
@@ -724,7 +908,7 @@
             {
                 cover: "assets/pepoyo_cover.jpg",
                 src: "songs/ぺぽよ - でんでん心電図.mp3",
-                title: "ぺぽよ - でんでん心電図",
+                title: "でんでん心電図",
                 artist: "ぺぽよ",
                 duration: "3:15",
                 display: true
@@ -732,7 +916,7 @@
             {
                 cover: "assets/pepoyo_cover.jpg",
                 src: "songs/ぺぽよ - 失态生态实验体.mp3",
-                title: "ぺぽよ - 失態生態実験体",
+                title: "失態生態実験体",
                 artist: "ぺぽよ",
                 duration: "4:10",
                 display: true
@@ -740,7 +924,7 @@
             {
                 cover: "assets/12.png",
                 src: "songs/bk & 重音テト - 臙脂 ft. 重音テト.mp3",
-                title: "bk & 重音テト - 臙脂 ft. 重音テト",
+                title: "臙脂 ft. 重音テト",
                 artist: "bk,重音テト",
                 duration: "3:50",
                 display: true
@@ -756,7 +940,7 @@
             {
                 cover: "assets/14.jpg",
                 src: "songs/メズマライザー (feat. 初音ミク&重音テト).mp3",
-                title: "サツキ,初音ミク,重音テト - メズマライザー",
+                title: "メズマライザー",
                 artist: "サツキ,初音ミク,重音テト",
                 duration: "3:55",
                 display: true
@@ -764,7 +948,7 @@
             {
                 cover: "assets/15.jpg",
                 src: "songs/DECO27,初音ミク - モニタリング.mp3",
-                title: "DECO27,初音ミク - モニタリング",
+                title: "モニタリング",
                 artist: "DECO27,初音ミク",
                 duration: "4:05",
                 display: true
@@ -780,7 +964,7 @@
             {
                 cover: "assets/17.jpg",
                 src: "songs/ぺぽよ,初音ミク - めんへらーめん.mp3",
-                title: "ぺぽよ,初音ミク - めんへらーめん",
+                title: "めんへらーめん",
                 artist: "ぺぽよ,初音ミク",
                 duration: "3:20",
                 display: true
@@ -788,7 +972,7 @@
             {
                 cover: "assets/18.jpg",
                 src: "songs/ピノキオピー,初音ミク,重音テト - T氏の話を信じるな (feat. 初音ミク & 重音テト).mp3",
-                title: "ピノキオピー,初音ミク,重音テト - T氏の話を信じるな",
+                title: "T氏の話を信じるな",
                 artist: "ピノキオピー,初音ミク,重音テト",
                 duration: "4:15",
                 display: true
@@ -796,7 +980,7 @@
             {
                 cover: "assets/19.jpg",
                 src: "songs/DECO27,初音ミク - ラビットホール.mp3",
-                title: "DECO27,初音ミク - ラビットホール",
+                title: "ラビットホール",
                 artist: "DECO27,初音ミク",
                 duration :"2:39",
                 display: true
