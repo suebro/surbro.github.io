@@ -808,7 +808,12 @@
             currentArtist: 'all',
             isPlaying: false,
             isLooping: false,
-            currentSongIndex: 0
+            currentSongIndex: 0,
+            listState: {
+                filterArtist: 'all',
+                searchQuery: '',
+                activeIndex: 0
+            }
         };
 
         // 初始化函数
@@ -834,14 +839,22 @@
         function renderSongList() {
             elements.songList.innerHTML = '';
             
-            songs.forEach((song, index) => {
-                if (!song.display) return;
-                
+            const filteredSongs = filterSongs();
+            
+            filteredSongs.forEach((song, displayedIndex) => {
+                let actualIndex = 0;
+                for (let i = 0; i < songs.length; i++) {
+                    if (songs[i].src === song.src) {
+                        actualIndex = i;
+                        break;
+                    }
+                }
+
                 const songCard = document.createElement('div');
                 songCard.className = 'song-card';
-                songCard.dataset.index = index;
+                songCard.dataset.index = actualIndex;
                 
-                if (index === playerState.currentSongIndex) {
+                if (actualIndex === playerState.currentSongIndex) {
                     songCard.classList.add('active');
                 }
                 
@@ -855,10 +868,88 @@
                 `;
                 
                 songCard.addEventListener('click', () => {
-                    selectSongByIndex(index);
+                    // 只更新列表激活状态，不影响播放
+                    playerState.listState.activeIndex = actualIndex;
+                    renderSongList();
+                    
+                    // 播放选中的歌曲
+                    playSelectedSong(actualIndex);
                 });
                 
                 elements.songList.appendChild(songCard);
+            });
+        }
+
+        // 过滤歌曲
+        function filterSongs() {
+            const normalizedQuery = playerState.listState.searchQuery.toLowerCase().trim();
+            const filterArtist = playerState.listState.filterArtist;
+            
+            return songs.filter((song, index) => {
+                if (index === 0) return true; // 保留选歌菜单
+                
+                // 艺术家过滤
+                if (filterArtist !== 'all') {
+                    const artists = song.artist.split(',');
+                    if (!artists.some(a => a.trim() === filterArtist)) {
+                        return false;
+                    }
+                }
+                
+                // 搜索过滤
+                if (normalizedQuery !== '') {
+                    const inTitle = song.title.toLowerCase().includes(normalizedQuery);
+                    const inArtist = song.artist.toLowerCase().includes(normalizedQuery);
+                    return inTitle || inArtist;
+                }
+                
+                return true;
+            });
+        }
+
+        // 播放选中的歌曲
+        function playSelectedSong(originalIndex) {
+            if (originalIndex === 0) return; // 选歌菜单不播放
+            
+            const song = songs[originalIndex];
+            if (!song) return;
+            
+            // 记录当前播放状态
+            const wasPlaying = playerState.isPlaying;
+            
+            // 设置当前播放歌曲索引
+            playerState.currentSongIndex = originalIndex;
+            
+            // 更新歌曲标题
+            updateSongTitle(song.title);
+            
+            // 停止当前播放
+            pauseMusic();
+            
+            // 显示加载动画
+            showLoadingSpinner();
+            
+            // 设置歌曲源
+            elements.musicPlayer.src = song.src;
+            elements.musicPlayer.load();
+            elements.albumCover.src = song.cover;
+            elements.albumCover.style.opacity = 0;
+            
+            setTimeout(() => {
+                elements.albumCover.style.opacity = 1;
+            }, 10);
+            
+            // 重置进度条
+            elements.progressBar.value = 0;
+            elements.currentTimeDisplay.textContent = formatTime(0);
+            elements.totalTimeDisplay.textContent = formatTime(0);
+            
+            // 加载后自动播放（如果之前正在播放）
+            elements.musicPlayer.addEventListener('canplay', function autoPlayHandler() {
+                if (wasPlaying) {
+                    playMusic();
+                }
+                elements.musicPlayer.removeEventListener('canplay', autoPlayHandler);
             });
         }
 
@@ -874,59 +965,6 @@
             elements.songTitle.textContent = title;
         }
 
-        // 通过索引选择歌曲
-        function selectSongByIndex(index) {
-            if (index < 0 || index >= songs.length) return;
-            
-            playerState.currentSongIndex = index;
-            const song = songs[index];
-            
-            // 更新歌曲标题
-            updateSongTitle(song.title);
-            
-            // 停止当前播放
-            pauseMusic();
-            
-            if (song.src) {
-                // 显示加载动画
-                showLoadingSpinner();
-                
-                // 使用本地文件路径
-                elements.musicPlayer.src = song.src;
-                elements.musicPlayer.load();
-                elements.albumCover.src = song.cover;
-                elements.albumCover.style.opacity = 0;
-                
-                setTimeout(() => {
-                    elements.albumCover.style.opacity = 1;
-                }, 10);
-                
-                // 重置进度条
-                elements.progressBar.value = 0;
-                elements.currentTimeDisplay.textContent = formatTime(0);
-                elements.totalTimeDisplay.textContent = formatTime(0);
-                
-                // 更新激活的歌曲卡片
-                document.querySelectorAll('.song-card').forEach(card => {
-                    card.classList.remove('active');
-                });
-                
-                const activeCard = document.querySelector(`.song-card[data-index="${index}"]`);
-                if (activeCard) {
-                    activeCard.classList.add('active');
-                    activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            } else {
-                elements.musicPlayer.src = '';
-                elements.albumCover.src = 'assets/default_cover.jpg';
-                elements.progressBar.value = 0;
-                elements.currentTimeDisplay.textContent = formatTime(0);
-                elements.totalTimeDisplay.textContent = formatTime(0);
-                hideLoadingSpinner();
-                updateSongTitle('Ciallo～(∠・ω< )⌒☆');
-            }
-        }
-
         // 播放/暂停切换
         function togglePlayPause() {
             if (elements.musicPlayer.paused || elements.musicPlayer.ended) {
@@ -939,15 +977,14 @@
         // 播放音乐
         function playMusic() {
             if (!elements.musicPlayer.src) {
-                // 如果没有选择歌曲，自动选择第一首
-                selectSongByIndex(1);
-                
-                // 添加一个小的延迟以确保歌曲加载
-                setTimeout(() => {
-                    if (elements.musicPlayer.src) {
+                // 如果没有选择歌曲，自动选择第一首可播放的歌曲
+                const firstPlayableIndex = songs.findIndex((song, index) => index > 0 && song.src);
+                if (firstPlayableIndex !== -1) {
+                    playSelectedSong(firstPlayableIndex);
+                    setTimeout(() => {
                         playMusic();
-                    }
-                }, 200);
+                    }, 200);
+                }
                 return;
             }
             
@@ -1034,13 +1071,13 @@
         function prevSong() {
             let prevIndex = playerState.currentSongIndex - 1;
             
-            // 跳过隐藏的歌曲
-            while (prevIndex > 0 && !songs[prevIndex].display) {
+            // 查找前一首可播放的歌曲
+            while (prevIndex > 0 && !songs[prevIndex].src) {
                 prevIndex--;
             }
             
             if (prevIndex >= 1) {
-                selectSongByIndex(prevIndex);
+                playSelectedSong(prevIndex);
                 playMusic();
             }
         }
@@ -1049,24 +1086,24 @@
         function nextSong() {
             let nextIndex = playerState.currentSongIndex + 1;
             
-            // 跳过隐藏的歌曲
-            while (nextIndex < songs.length && !songs[nextIndex].display) {
+            // 查找下一首可播放的歌曲
+            while (nextIndex < songs.length && !songs[nextIndex].src) {
                 nextIndex++;
             }
             
             if (nextIndex < songs.length) {
-                selectSongByIndex(nextIndex);
+                playSelectedSong(nextIndex);
                 playMusic();
             } else {
                 // 如果是最后一首，回到第一首
-                selectSongByIndex(1);
+                playSelectedSong(1);
                 playMusic();
             }
         }
 
         // 歌手分类功能
-        function filterByArtist(artist) {
-            playerState.currentArtist = artist;
+        function filterByArtist(artist, btnElem) {
+            playerState.listState.filterArtist = artist;
             
             // 重置所有按钮状态
             document.querySelectorAll('.artist-btn').forEach(btn => {
@@ -1074,64 +1111,15 @@
             });
             
             // 激活当前按钮
-            event.target.classList.add('active');
-            
-            // 更新歌曲显示状态
-            songs.forEach((song, index) => {
-                if (index === 0) { // 跳过菜单项
-                    song.display = true;
-                    return;
-                }
-                
-                if (artist === 'all') {
-                    song.display = true;
-                } else {
-                    const artists = song.artist.split(',');
-                    song.display = artists.some(a => a.trim() === artist);
-                }
-            });
+            if (btnElem) btnElem.classList.add('active');
             
             // 重新渲染歌曲列表
             renderSongList();
-            
-            // 如果当前歌曲被隐藏，则选择第一首显示的歌曲
-            if (!songs[playerState.currentSongIndex].display) {
-                const firstVisibleIndex = songs.findIndex((song, index) => index > 0 && song.display);
-                if (firstVisibleIndex !== -1) {
-                    selectSongByIndex(firstVisibleIndex);
-                } else {
-                    selectSongByIndex(0);
-                }
-            }
         }
 
         // 搜索歌曲
         function searchSongs(query) {
-            const normalizedQuery = query.toLowerCase().trim();
-            
-            songs.forEach((song, index) => {
-                if (index === 0) { // 跳过菜单项
-                    song.display = true;
-                    return;
-                }
-                
-                if (normalizedQuery === '') {
-                    // 如果没有搜索词，根据当前艺术家过滤
-                    if (playerState.currentArtist === 'all') {
-                        song.display = true;
-                    } else {
-                        const artists = song.artist.split(',');
-                        song.display = artists.some(a => a.trim() === playerState.currentArtist);
-                    }
-                } else {
-                    // 根据搜索词过滤
-                    const inTitle = song.title.toLowerCase().includes(normalizedQuery);
-                    const inArtist = song.artist.toLowerCase().includes(normalizedQuery);
-                    song.display = inTitle || inArtist;
-                }
-            });
-            
-            // 重新渲染歌曲列表
+            playerState.listState.searchQuery = query;
             renderSongList();
         }
 
@@ -1177,7 +1165,7 @@
             elements.artistFilter.addEventListener('click', (e) => {
                 if (e.target.classList.contains('artist-btn')) {
                     const artist = e.target.getAttribute('data-artist');
-                    filterByArtist(artist);
+                    filterByArtist(artist, e.target);
                 }
             });
             
@@ -1192,11 +1180,6 @@
                 // 确保总时间正确显示
                 elements.totalTimeDisplay.textContent = formatTime(elements.musicPlayer.duration);
                 hideLoadingSpinner();
-                
-                // 如果之前正在播放，继续播放
-                if (playerState.isPlaying) {
-                    elements.musicPlayer.play();
-                }
             });
             
             elements.musicPlayer.addEventListener('ended', () => {
