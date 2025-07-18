@@ -841,20 +841,12 @@
             
             const filteredSongs = filterSongs();
             
-            filteredSongs.forEach((song, displayedIndex) => {
-                let actualIndex = 0;
-                for (let i = 0; i < songs.length; i++) {
-                    if (songs[i].src === song.src) {
-                        actualIndex = i;
-                        break;
-                    }
-                }
-
+            filteredSongs.forEach((song, index) => {
                 const songCard = document.createElement('div');
                 songCard.className = 'song-card';
-                songCard.dataset.index = actualIndex;
+                songCard.dataset.index = index + 1; //索引从1开始
                 
-                if (actualIndex === playerState.currentSongIndex) {
+                if (index + 1 === playerState.listState.activeIndex) {
                     songCard.classList.add('active');
                 }
                 
@@ -869,11 +861,11 @@
                 
                 songCard.addEventListener('click', () => {
                     // 只更新列表激活状态，不影响播放
-                    playerState.listState.activeIndex = actualIndex;
+                    playerState.listState.activeIndex = index + 1;
                     renderSongList();
                     
                     // 播放选中的歌曲
-                    playSelectedSong(actualIndex);
+                    playSelectedSong(index + 1);
                 });
                 
                 elements.songList.appendChild(songCard);
