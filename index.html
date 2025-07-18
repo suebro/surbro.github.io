@@ -844,9 +844,9 @@
             filteredSongs.forEach((song, index) => {
                 const songCard = document.createElement('div');
                 songCard.className = 'song-card';
-                songCard.dataset.index = index + 1; //索引从1开始
+                songCard.dataset.index = index; //索引从0开始
                 
-                if (index + 1 === playerState.listState.activeIndex) {
+                if (index === playerState.listState.activeIndex) {
                     songCard.classList.add('active');
                 }
                 
@@ -861,17 +861,17 @@
                 
                 songCard.addEventListener('click', () => {
                     // 只更新列表激活状态，不影响播放
-                    playerState.listState.activeIndex = index + 1;
+                    playerState.listState.activeIndex = index;
                     renderSongList();
                     
                     // 播放选中的歌曲
-                    playSelectedSong(index + 1);
+                    playSelectedSong(index);
                 });
                 
                 elements.songList.appendChild(songCard);
             });
         }
-
+        
         // 过滤歌曲
         function filterSongs() {
             const normalizedQuery = playerState.listState.searchQuery.toLowerCase().trim();
@@ -900,17 +900,17 @@
         }
 
         // 播放选中的歌曲
-        function playSelectedSong(originalIndex) {
-            if (originalIndex === 0) return; // 选歌菜单不播放
+        function playSelectedSong(index) {
+            if (index === 0) return; // 选歌菜单不播放
             
-            const song = songs[originalIndex];
+            const song = songs[index];
             if (!song) return;
             
             // 记录当前播放状态
             const wasPlaying = playerState.isPlaying;
             
             // 设置当前播放歌曲索引
-            playerState.currentSongIndex = originalIndex;
+            playerState.currentSongIndex = index;
             
             // 更新歌曲标题
             updateSongTitle(song.title);
